@@ -1,3 +1,6 @@
 *.txt
 *.gz
 *.tbi
+*.log
+*.zip
+*.html
