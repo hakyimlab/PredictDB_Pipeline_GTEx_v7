@@ -201,8 +201,9 @@ if __name__=='__main__':
     quant_df = quant_df.loc[quant_std_df.index]
 
     # exclude chromosomes
-    chrs = subprocess.check_output('tabix --list-chroms '+args.vcf, shell=True, executable='/bin/bash')
-    chrs = chrs.decode().strip().split()
+    # chrs = subprocess.check_output('tabix --list-chroms '+args.vcf, shell=True, executable='/bin/bash')
+    # chrs = chrs.decode().strip().split()
+    chrs = list(map(str, range(1,23)))
     quant_std_df = quant_std_df[quant_std_df.chr.isin(chrs)]
     quant_df = quant_df[quant_df.chr.isin(chrs)]
 

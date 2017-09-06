@@ -10,11 +10,11 @@ def get_ids_from_vcf(vcf_file):
         sample_ids = line.strip().split()[9:]
         return set(sample_ids)
 
-vcf_file = '../v7/56055/gtex/exchange/GTEx_phs000424/exchange/analysis_releases/GTEx_Analysis_2016-01-15_v7/genotypes/WGS/variant_calls/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.vcf.gz'
+vcf_file = '../genotype/imputation_results/chr1.dose.vcf.gz'
 vcf_sample_ids = get_ids_from_vcf(vcf_file)
 tissue_donors = defaultdict(list)
 
-samples_file = '../v7/sample_annotations/GTEx_Analysis_2016-01-15_v7_SampleAttributesDS.txt'
+samples_file = '/group/gtex-group/v7/sample_annotations/GTEx_Analysis_2016-01-15_v7_SampleAttributesDS.txt'
 
 with open(samples_file) as fh:
     hdr = fh.readline() # Drop header
