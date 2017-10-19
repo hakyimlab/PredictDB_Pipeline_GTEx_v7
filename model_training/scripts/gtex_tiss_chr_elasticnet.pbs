@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#PBS -S /bin/bash
+#PBS -l walltime=36:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=12gb
+#PBS -d /group/im-lab/nas40t2/scott/gtex_v7_imputed_europeans/model_training/scripts/
+#PBS -e ../joblogs/${PBS_JOBNAME}.err
+#PBS -o ../joblogs/${PBS_JOBNAME}.out
+
+module load gcc/6.2.0
+module load R/3.4.1
+Rscript gtex_tiss_chrom_training.R ${tiss} ${chrom}
+
