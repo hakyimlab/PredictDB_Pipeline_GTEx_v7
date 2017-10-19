@@ -167,7 +167,7 @@ if __name__=='__main__':
     parser.add_argument('annotation_gtf', help='GTF annotation')
     parser.add_argument('donors', help='file with Sample IDs')
     parser.add_argument('prefix', help='Prefix for output file names')
-    parser.add_argument('vcf', help='VCF file with donor IDs')
+    # parser.add_argument('vcf', help='VCF file with donor IDs')
     parser.add_argument('-o', '--output_dir', default='.', help='Output directory')
     parser.add_argument('--expression_threshold', type=np.double, default=0.1, help='Selects genes with > expression_threshold expression in at least min_samples')
     parser.add_argument('--count_threshold', type=np.int32, default=5, help='Selects genes with > count_threshold reads in at least min_samples')
