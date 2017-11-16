@@ -50,7 +50,7 @@ get_cis_genotype <- function(gt_df, snp_annot, coords, cis_window) {
   snp_info <- snp_annot %>% filter((pos >= (coords[1] - cis_window) & !is.na(rsid_dbSNP150)) & (pos <= (coords[2] + cis_window)))
   if (nrow(snp_info) == 0)
     return(NA)
-  cis_gt <- gt_df %>% select(one_of(snp_info$varID))
+  cis_gt <- gt_df %>% select(one_of(intersect(snp_info$varID, colnames(gt_df))))
   column_labels <- colnames(cis_gt)
   row_labels <- rownames(cis_gt)
   # Convert cis_gt to a matrix for glmnet
@@ -176,8 +176,9 @@ main <- function(snp_annot_file, gene_annot_file, genotype_file, expression_file
   model_summary_file <- '../summary/' %&% prefix %&% '_chr' %&% chrom %&% '_model_summaries.txt'
   model_summary_cols <- c('gene_id', 'gene_name', 'gene_type', 'alpha', 'n_snps_in_window', 'n_snps_in_model', 'lambda_min_mse',
                           'test_R2_avg', 'test_R2_sd', 'cv_R2_avg', 'cv_R2_sd', 'in_sample_R2',
-                          'nested_cv_fisher_pval', 'rho_avg', 'rho_se', 'rho_zscore', 'rho_avg_squared', 'zscore_pval')
-  write(model_summary_cols, file = model_summary_file, ncol = 18, sep = '\t')
+                          'nested_cv_fisher_pval', 'rho_avg', 'rho_se', 'rho_zscore', 'rho_avg_squared', 'zscore_pval',
+                          'cv_rho_avg', 'cv_rho_se', 'cv_rho_avg_squared', 'cv_zscore_est', 'cv_zscore_pval', 'cv_pval_est')
+  write(model_summary_cols, file = model_summary_file, ncol = 24, sep = '\t')
   
   weights_file <- '../weights/' %&% prefix %&% '_chr' %&% chrom %&% '_weights.txt'
   weights_col <- c('gene_id', 'rsid', 'varID', 'ref', 'alt', 'beta')
@@ -203,11 +204,11 @@ main <- function(snp_annot_file, gene_annot_file, genotype_file, expression_file
     cis_gt <- get_cis_genotype(gt_df, snp_annot, coords, cis_window)
     if (all(is.na(cis_gt))) {
       # No snps within window for gene.
-      model_summary <- c(gene, gene_name, gene_type, alpha, 0, 0, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
-      write(model_summary, file = model_summary_file, append = TRUE, ncol = 18, sep = '\t')
+      model_summary <- c(gene, gene_name, gene_type, alpha, 0, 0, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+      write(model_summary, file = model_summary_file, append = TRUE, ncol = 24, sep = '\t')
       next
     }
-    model_summary <- c(gene, gene_name, gene_type, alpha, ncol(cis_gt), 0, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+    model_summary <- c(gene, gene_name, gene_type, alpha, ncol(cis_gt), 0, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
     if (ncol(cis_gt) >= 2) {
       expression_vec <- expr_df[,i]
       adj_expression <- adjust_for_covariates(expression_vec, covariates_df)
@@ -228,15 +229,31 @@ main <- function(snp_annot_file, gene_annot_file, genotype_file, expression_file
                       error = function(cond) {message('Error'); message(geterrmessage()); list()})
       if (length(fit) > 0) {
         cv_R2_folds <- rep(0, n_folds)
+        cv_corr_folds <- rep(0, n_folds)
+        cv_zscore_folds <- rep(0, n_folds)
+        cv_pval_folds <- rep(0, n_folds)
         best_lam_ind <- which.min(fit$cvm)
         for (j in 1:n_folds) {
           fold_idxs <- which(cv_fold_ids == j)
-          cv_R2_folds[j] <- calc_R2(adj_expression[fold_idxs], fit$fit.preval[fold_idxs, best_lam_ind])
+          adj_expr_fold_pred <- fit$fit.preval[fold_idxs, best_lam_ind]
+          cv_R2_folds[j] <- calc_R2(adj_expression[fold_idxs], adj_expr_fold_pred)
+          cv_corr_folds[j] <- ifelse(sd(adj_expr_fold_pred) != 0, cor(adj_expr_fold_pred, adj_expression[fold_idxs]), 0)
+          cv_zscore_folds[j] <- atanh(cv_corr_folds[j])*sqrt(length(adj_expression[fold_idxs]) - 3) # Fisher transformation
+          cv_pval_folds[j] <- ifelse(sd(adj_expr_fold_pred) != 0, cor.test(adj_expr_fold_pred, adj_expression[fold_idxs])$p.value, runif(1))
         }
         cv_R2_avg <- mean(cv_R2_folds)
         cv_R2_sd <- sd(cv_R2_folds)
         adj_expr_pred <- predict(fit, as.matrix(cis_gt), s = 'lambda.min')
         training_R2 <- calc_R2(adj_expression, adj_expr_pred)
+        
+        cv_rho_avg <- mean(cv_corr_folds)
+        cv_rho_se <- sd(cv_corr_folds)
+        cv_rho_avg_squared <- cv_rho_avg**2
+        # Stouffer's method for combining z scores.
+        cv_zscore_est <- sum(cv_zscore_folds) / sqrt(n_folds)
+        cv_zscore_pval <- 2*pnorm(abs(cv_zscore_est), lower.tail = FALSE)
+        cv_pval_est <- pchisq(-2 * sum(log(cv_pval_folds)), 2*n_folds, lower.tail = F)
+        
         if (fit$nzero[best_lam_ind] > 0) {
           
           weights <- fit$glmnet.fit$beta[which(fit$glmnet.fit$beta[,best_lam_ind] != 0), best_lam_ind]
@@ -250,15 +267,17 @@ main <- function(snp_annot_file, gene_annot_file, genotype_file, expression_file
           covariance_df <- do_covariance(gene, cis_gt, weighted_snps_info$rsid_dbSNP150, weighted_snps_info$varID)
           write.table(covariance_df, file = covariance_file, append = TRUE, quote = FALSE, col.names = FALSE, row.names = FALSE, sep = " ")
           model_summary <- c(gene, gene_name, gene_type, alpha, ncol(cis_gt), fit$nzero[best_lam_ind], fit$lambda[best_lam_ind], R2_avg, R2_sd, cv_R2_avg, cv_R2_sd, training_R2, pval_est,
-                             rho_avg, rho_se, rho_zscore, rho_avg_squared, zscore_pval)
+                             rho_avg, rho_se, rho_zscore, rho_avg_squared, zscore_pval, cv_rho_avg, cv_rho_se, cv_rho_avg_squared, cv_zscore_est, cv_zscore_pval, cv_pval_est)
         } else {
           model_summary <- c(gene, gene_name, gene_type, alpha, ncol(cis_gt), 0, fit$lambda[best_lam_ind], R2_avg, R2_sd,
-                             cv_R2_avg, cv_R2_sd, training_R2, pval_est, rho_avg, rho_se, rho_zscore, rho_avg_squared, zscore_pval)
+                             cv_R2_avg, cv_R2_sd, training_R2, pval_est, rho_avg, rho_se, rho_zscore, rho_avg_squared, zscore_pval,
+                             cv_rho_avg, cv_rho_se, cv_rho_avg_squared, cv_zscore_est, cv_zscore_pval, cv_pval_est)
         }
       } else {
-        model_summary <- c(gene, gene_name, gene_type, alpha, ncol(cis_gt), 0, NA, R2_avg, R2_sd, NA, NA, NA, pval_est, rho_avg, rho_se, rho_zscore, rho_avg_squared, zscore_pval)
+        model_summary <- c(gene, gene_name, gene_type, alpha, ncol(cis_gt), 0, NA, R2_avg, R2_sd, NA, NA, NA, pval_est, rho_avg, rho_se, rho_zscore, rho_avg_squared, zscore_pval,
+                           NA, NA, NA, NA, NA, NA)
       }
     }
-    write(model_summary, file = model_summary_file, append = TRUE, ncol = 18, sep = '\t')
+    write(model_summary, file = model_summary_file, append = TRUE, ncol = 24, sep = '\t')
   }
 }
