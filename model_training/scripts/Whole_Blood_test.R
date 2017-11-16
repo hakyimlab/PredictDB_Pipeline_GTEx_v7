@@ -10,6 +10,5 @@ chrom <- 22
 prefix1 <- "Whole_Blood_nested_cv"
 prefix2 <- "Whole_Blood_nested_cv_permuted"
 
-main(snp_annot_file, gene_annot_file, genotype_file, expression_file, covariates_file, chrom, prefix1, null_testing=FALSE)
 main(snp_annot_file, gene_annot_file, genotype_file, expression_file, covariates_file, chrom, prefix2, null_testing=TRUE)
 

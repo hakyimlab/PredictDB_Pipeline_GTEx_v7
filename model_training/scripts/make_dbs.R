@@ -81,8 +81,7 @@ for (tiss in tissues) {
     weights <- rbind(weights,
                        read.table('../weights/' %&% tiss %&% '_nested_cv_chr' %&% as.character(i) %&% '_weights.txt', header = T, stringsAsFactors = F))
   }
-  
-  weights <- rename(weights, gene = gene_id) %>% distinct(varID, .keep_all = TRUE)
+  weights <- rename(weights, gene = gene_id)
   dbWriteTable(conn, 'weights', weights, overwrite = TRUE)
   dbGetQuery(conn, "CREATE INDEX weights_rsid ON weights (rsid)")
   dbGetQuery(conn, "CREATE INDEX weights_gene ON weights (gene)")
