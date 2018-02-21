@@ -2,57 +2,58 @@ library(dplyr)
 library(RSQLite)
 "%&%" <- function(a,b) paste(a,b, sep='')
 
-tissues <- c('Adipose_Subcutaneous',
-             'Adipose_Visceral_Omentum',
-             'Adrenal_Gland',
-             'Artery_Aorta',
-             'Artery_Coronary',
-             'Artery_Tibial',
-             'Brain_Amygdala',
-             'Brain_Anterior_cingulate_cortex_BA24',
-             'Brain_Caudate_basal_ganglia',
-             'Brain_Cerebellar_Hemisphere',
-             'Brain_Cerebellum',
-             'Brain_Cortex',
-             'Brain_Frontal_Cortex_BA9',
-             'Brain_Hippocampus',
-             'Brain_Hypothalamus',
-             'Brain_Nucleus_accumbens_basal_ganglia',
-             'Brain_Putamen_basal_ganglia',
-             'Brain_Spinal_cord_cervical_c-1',
-             'Brain_Substantia_nigra',
-             'Breast_Mammary_Tissue',
-             'Cells_EBV-transformed_lymphocytes',
-             'Cells_Transformed_fibroblasts',
-             'Colon_Sigmoid',
-             'Colon_Transverse',
-             'Esophagus_Gastroesophageal_Junction',
-             'Esophagus_Mucosa',
-             'Esophagus_Muscularis',
-             'Heart_Atrial_Appendage',
-             'Heart_Left_Ventricle',
-             'Liver',
-             'Lung',
-             'Minor_Salivary_Gland',
-             'Muscle_Skeletal',
-             'Nerve_Tibial',
-             'Ovary',
-             'Pancreas',
-             'Pituitary',
-             'Prostate',
-             'Skin_Not_Sun_Exposed_Suprapubic',
-             'Skin_Sun_Exposed_Lower_leg',
-             'Small_Intestine_Terminal_Ileum',
-             'Spleen',
-             'Stomach',
-             'Testis',
-             'Thyroid',
-             'Uterus',
-             'Vagina',
-             'Whole_Blood'
-)
+# tissues <- c('Adipose_Subcutaneous',
+#              'Adipose_Visceral_Omentum',
+#              'Adrenal_Gland',
+#              'Artery_Aorta',
+#              'Artery_Coronary',
+#              'Artery_Tibial',
+#              'Brain_Amygdala',
+#              'Brain_Anterior_cingulate_cortex_BA24',
+#              'Brain_Caudate_basal_ganglia',
+#              'Brain_Cerebellar_Hemisphere',
+#              'Brain_Cerebellum',
+#              'Brain_Cortex',
+#              'Brain_Frontal_Cortex_BA9',
+#              'Brain_Hippocampus',
+#              'Brain_Hypothalamus',
+#              'Brain_Nucleus_accumbens_basal_ganglia',
+#              'Brain_Putamen_basal_ganglia',
+#              'Brain_Spinal_cord_cervical_c-1',
+#              'Brain_Substantia_nigra',
+#              'Breast_Mammary_Tissue',
+#              'Cells_EBV-transformed_lymphocytes',
+#              'Cells_Transformed_fibroblasts',
+#              'Colon_Sigmoid',
+#              'Colon_Transverse',
+#              'Esophagus_Gastroesophageal_Junction',
+#              'Esophagus_Mucosa',
+#              'Esophagus_Muscularis',
+#              'Heart_Atrial_Appendage',
+#              'Heart_Left_Ventricle',
+#              'Liver',
+#              'Lung',
+#              'Minor_Salivary_Gland',
+#              'Muscle_Skeletal',
+#              'Nerve_Tibial',
+#              'Ovary',
+#              'Pancreas',
+#              'Pituitary',
+#              'Prostate',
+#              'Skin_Not_Sun_Exposed_Suprapubic',
+#              'Skin_Sun_Exposed_Lower_leg',
+#              'Small_Intestine_Terminal_Ileum',
+#              'Spleen',
+#              'Stomach',
+#              'Testis',
+#              'Thyroid',
+#              'Uterus',
+#              'Vagina',
+#              'Whole_Blood'
+# )
+tissues <- c('Heart_Atrial_Appendage')
 driver <- dbDriver('SQLite')
-gene_annot <- read.table("../../prepare_data/expression/gencode.v19.genes.patched_contigs.parsed.txt", header = T, stringsAsFactors = F)
+gene_annot <- read.table("../../prepare_data/expression/gencode_v26_parsed.txt", header = T, stringsAsFactors = F)
 
 for (tiss in tissues) {
   print(tiss)
@@ -71,7 +72,7 @@ for (tiss in tissues) {
   
   model_summaries <- rename(model_summaries, gene = gene_id)
 
-  conn <- dbConnect(drv = driver, '../dbs/gtex_v7_' %&% tiss %&% '_imputed_europeans_tw0.5.db')
+  conn <- dbConnect(drv = driver, '../dbs/gtex_v8_' %&% tiss %&% '_qdi.db')
   dbWriteTable(conn, 'model_summaries', model_summaries, overwrite = TRUE)
   dbGetQuery(conn, "CREATE INDEX gene_model_summary ON model_summaries (gene)")
   

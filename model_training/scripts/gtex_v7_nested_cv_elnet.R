@@ -2,6 +2,8 @@ suppressMessages(library(dplyr))
 suppressMessages(library(glmnet))
 suppressMessages((library(reshape2)))
 suppressMessages(library(methods))
+suppressMessages(library(dplyr))
+
 "%&%" <- function(a,b) paste(a,b, sep = "")
 
 
@@ -278,6 +280,7 @@ main <- function(snp_annot_file, gene_annot_file, genotype_file, expression_file
                            NA, NA, NA, NA, NA, NA)
       }
     }
+    #cat("Completed:", gene, "\n")
     write(model_summary, file = model_summary_file, append = TRUE, ncol = 24, sep = '\t')
   }
 }

@@ -6,3 +6,12 @@
 *.html
 *.gtf
 *.DS_Store
+
+.ipynb_checkpoints
+.python-version
+__pycache__
+.idea/
+model_training/dbs/
+model_training/joblogs/
+prepare_data/logs/
+
