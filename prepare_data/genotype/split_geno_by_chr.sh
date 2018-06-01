@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N job_gtex_v8_split_geno
 #PBS -S /bin/bash
-#PBS -l walltime=12:00:00
+#PBS -l walltime=24:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=8gb
 #PBS -o ../joblogs/${PBS_JOBNAME}.o${PBS_JOBID}.log

@@ -7,7 +7,7 @@ tiss <- argv[1]
 chrom <- argv[2]
 
 snp_annot_file <- "../../prepare_data/genotype/gtex_v8_eur_shapeit2_phased_maf01_snp_annot.chr" %&% chrom %&% ".txt"
-genotype_file <- "../../prepare_data/genotype/gtex_v8_eur_shapeit2_phased_maf01_qdimputed.chr" %&% chrom %&% ".txt.gz"
+genotype_file <- "../../prepare_data/genotype/gtex_v8_eur_shapeit2_phased_maf01_qdimputed_maf0.01_chr" %&% chrom %&% ".txt.gz"
 gene_annot_file <- "../../prepare_data/expression/gencode_v26_parsed.txt"
 expression_file <- "../../prepare_data/expression/" %&% tiss %&% "_Analysis.expression.txt"
 covariates_file <- "../../prepare_data/covariates/" %&% tiss %&% "_Analysis.combined_covariates.txt"

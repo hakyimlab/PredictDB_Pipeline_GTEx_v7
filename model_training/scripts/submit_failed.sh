@@ -5,7 +5,7 @@ FAILED=not_ran.txt
 tissue=($(cat $FAILED | cut - -d " " -f 1))
 chrom=($(cat $FAILED | cut - -d " " -f 2))
 
-L=${#tissue[@]}
+L="$((${#tissue[@]}-1))"
 for i in $(eval echo "{0..$L}"); do
   ti_s=${tissue[$i]}
   ch_s=${chrom[$i]}

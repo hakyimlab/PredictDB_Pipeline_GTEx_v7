@@ -4,62 +4,63 @@ library(RSQLite)
 
 driver <- dbDriver("SQLite")
 
-# tissues <- c('Adipose_Subcutaneous',
-#              'Adipose_Visceral_Omentum',
-#              'Adrenal_Gland',
-#              'Artery_Aorta',
-#              'Artery_Coronary',
-#              'Artery_Tibial',
-#              'Brain_Amygdala',
-#              'Brain_Anterior_cingulate_cortex_BA24',
-#              'Brain_Caudate_basal_ganglia',
-#              'Brain_Cerebellar_Hemisphere',
-#              'Brain_Cerebellum',
-#              'Brain_Cortex',
-#              'Brain_Frontal_Cortex_BA9',
-#              'Brain_Hippocampus',
-#              'Brain_Hypothalamus',
-#              'Brain_Nucleus_accumbens_basal_ganglia',
-#              'Brain_Putamen_basal_ganglia',
-#              'Brain_Spinal_cord_cervical_c-1',
-#              'Brain_Substantia_nigra',
-#              'Breast_Mammary_Tissue',
-#              'Cells_EBV-transformed_lymphocytes',
-#              'Cells_Transformed_fibroblasts',
-#              'Colon_Sigmoid',
-#              'Colon_Transverse',
-#              'Esophagus_Gastroesophageal_Junction',
-#              'Esophagus_Mucosa',
-#              'Esophagus_Muscularis',
-#              'Heart_Atrial_Appendage',
-#              'Heart_Left_Ventricle',
-#              'Liver',
-#              'Lung',
-#              'Minor_Salivary_Gland',
-#              'Muscle_Skeletal',
-#              'Nerve_Tibial',
-#              'Ovary',
-#              'Pancreas',
-#              'Pituitary',
-#              'Prostate',
-#              'Skin_Not_Sun_Exposed_Suprapubic',
-#              'Skin_Sun_Exposed_Lower_leg',
-#              'Small_Intestine_Terminal_Ileum',
-#              'Spleen',
-#              'Stomach',
-#              'Testis',
-#              'Thyroid',
-#              'Uterus',
-#              'Vagina',
-#              'Whole_Blood'
-# )
+tissues <- c('Adipose_Subcutaneous',
+             'Adipose_Visceral_Omentum',
+             'Adrenal_Gland',
+             'Artery_Aorta',
+             'Artery_Coronary',
+             'Artery_Tibial',
+             'Brain_Amygdala',
+             'Brain_Anterior_cingulate_cortex_BA24',
+             'Brain_Caudate_basal_ganglia',
+             'Brain_Cerebellar_Hemisphere',
+             'Brain_Cerebellum',
+             'Brain_Cortex',
+             'Brain_Frontal_Cortex_BA9',
+             'Brain_Hippocampus',
+             'Brain_Hypothalamus',
+             'Brain_Nucleus_accumbens_basal_ganglia',
+             'Brain_Putamen_basal_ganglia',
+             'Brain_Spinal_cord_cervical_c-1',
+             'Brain_Substantia_nigra',
+             'Breast_Mammary_Tissue',
+             'Cells_EBV-transformed_lymphocytes',
+             'Cells_Cultured_fibroblasts',
+             'Colon_Sigmoid',
+             'Colon_Transverse',
+             'Esophagus_Gastroesophageal_Junction',
+             'Esophagus_Mucosa',
+             'Esophagus_Muscularis',
+             'Heart_Atrial_Appendage',
+             'Heart_Left_Ventricle',
+             'Liver',
+             'Lung',
+             'Minor_Salivary_Gland',
+             'Muscle_Skeletal',
+             'Nerve_Tibial',
+             'Ovary',
+             'Pancreas',
+             'Pituitary',
+             'Prostate',
+             'Skin_Not_Sun_Exposed_Suprapubic',
+             'Skin_Sun_Exposed_Lower_leg',
+             'Small_Intestine_Terminal_Ileum',
+             'Spleen',
+             'Stomach',
+             'Testis',
+             'Thyroid',
+             'Uterus',
+             'Vagina',
+             'Whole_Blood'
+)
 
-tissues <- c('Heart_Atrial_Appendage')
+#tissues <- c('Heart_Atrial_Appendage')
 
 for (tissue in tissues) {
-  print(tissue)
-  unfiltered_db <- "../dbs/gtex_v8_" %&% tissue %&% "_qdi.db"
-  filtered_db <- "../dbs/gtex_v8_" %&% tissue %&% "_qdi_signif.db"
+tryCatch({    
+  message(tissue)
+  unfiltered_db <- "../dbs/gtex_v8_" %&% tissue %&% "_qdir.db"
+  filtered_db <- "../dbs/gtex_v8_" %&% tissue %&% "_qdir_signif.db"
   in_conn <- dbConnect(driver, unfiltered_db)
   out_conn <- dbConnect(driver, filtered_db)
   model_summaries <- dbGetQuery(in_conn, 'select * from model_summaries where zscore_pval < 0.05 and rho_avg > 0.1')
@@ -77,4 +78,7 @@ for (tissue in tissues) {
   dbGetQuery(out_conn, "CREATE INDEX weights_gene ON weights (gene)")
   dbGetQuery(out_conn, "CREATE INDEX weights_rsid_gene ON weights (rsid, gene)")
   dbGetQuery(out_conn, "CREATE INDEX gene_model_summary ON extra (gene)")
+}, error = function(err){
+    message(paste("MY_ERROR:  ",err))
+})
 }

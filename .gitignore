@@ -14,4 +14,5 @@ __pycache__
 model_training/dbs/
 model_training/joblogs/
 prepare_data/logs/
-
+prepare_data/genotype/logs/
+model_training/scripts/not_ran*
