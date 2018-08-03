@@ -21,7 +21,7 @@ get_maf_filtered_genotype <- function(genotype_file_name,  maf, samples) {
   gt_df <- read.table(genotype_file_name, header = T, stringsAsFactors = F, row.names = 1)
   gt_df <- gt_df[,samples] %>% t() %>% as.data.frame()
   effect_allele_freqs <- colMeans(gt_df) / 2
-  gt_df <- gt_df[,which((effect_allele_freqs >= maf) | (effect_allele_freqs <= 1 - maf))]
+  gt_df <- gt_df[,which((effect_allele_freqs >= maf) & (effect_allele_freqs <= 1 - maf))]
   gt_df
 }
 
