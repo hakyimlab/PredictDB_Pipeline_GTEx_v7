@@ -5,7 +5,7 @@
 #PBS -l walltime=24:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=12gb
-#PBS -d /group/im-lab/nas40t2/scott/gtex_v7_imputed_europeans/model_training/scripts/
+#PBS -d /group/im-lab/nas40t2/owen/gtex_v7_imputed_europeans/model_training/scripts/
 #PBS -e ../joblogs/${PBS_JOBNAME}.err
 #PBS -o ../joblogs/${PBS_JOBNAME}.out
 

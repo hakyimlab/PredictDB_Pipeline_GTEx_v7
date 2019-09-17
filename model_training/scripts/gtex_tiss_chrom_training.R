@@ -1,4 +1,4 @@
-setwd("/group/im-lab/nas40t2/scott/gtex_v7_imputed_europeans/model_training/scripts/")
+setwd("/group/im-lab/nas40t2/owen/gtex_v7_imputed_europeans/model_training/scripts/")
 source("gtex_v7_nested_cv_elnet.R")
 "%&%" <- function(a,b) paste(a,b, sep='')
 

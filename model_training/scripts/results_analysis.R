@@ -1,4 +1,4 @@
-setwd("/Volumes/im-lab/nas40t2/scott/gtex_v7_imputed_europeans/model_training/scripts/")
+setwd("/Volumes/im-lab/nas40t2/owen/gtex_v7_imputed_europeans/model_training/scripts/")
 library(ggplot2)
 library(dplyr)
 
