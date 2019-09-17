@@ -1,4 +1,3 @@
-setwd("/group/im-lab/nas40t2/owen/gtex_v7_imputed_europeans/model_training/scripts/")
 source("gtex_v7_nested_cv_elnet.R")
 
 snp_annot_file <- "../../prepare_data/genotype/gtex_v7_hapmapceu_snp_annot.chr22.txt"
