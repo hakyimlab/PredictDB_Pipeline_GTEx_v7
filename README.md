@@ -1,6 +1,10 @@
 # PredictDB_Pipeline_GTEx_v7
 PredictDB Pipeline for GTEx v7 data
 
+You may want to use this [tutorial](https://github.com/hakyimlab/PredictDB-Tutorial) which contains the full code 
+
+--------------
+
 Comparison of V6p and V7 models can be found [here](http://hakyimlab.org/post/2017/v7-v6p-analysis/)
 
 ---------------
