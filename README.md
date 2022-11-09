@@ -1,7 +1,7 @@
 # PredictDB_Pipeline_GTEx_v7
 PredictDB Pipeline for GTEx v7 data
 
-You may want to use this [tutorial](https://github.com/hakyimlab/PredictDB-Tutorial) which contains the full code 
+# use this [tutorial](https://github.com/hakyimlab/PredictDB-Tutorial) which contains the full code 
 
 --------------
 
